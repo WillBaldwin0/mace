@@ -5,9 +5,43 @@ import copy
 import pytest
 import torch
 
+from mace.calculators import MACECalculator
 from tests.extensions.polar.test_polar_models import _build_minimal_model
 
 pytestmark = pytest.mark.polar
+
+
+@pytest.fixture
+def polar_calc_model():
+    return _build_minimal_model(torch.device("cpu"), torch.float64)
+
+
+def test_calculator_constructor_propagates_pbc_handling(polar_calc_model):
+    calc = MACECalculator(
+        models=[polar_calc_model],
+        model_type="PolarMACE",
+        device="cpu",
+        default_dtype="float64",
+        pbc_handling="slab",
+    )
+
+    assert calc.pbc_handling == "slab"
+    assert calc.models[0].pbc_handling == "slab"
+    assert calc.models[0].electric_potential_descriptor.pbc_handling == "slab"
+    assert calc.models[0].coulomb_energy.pbc_handling == "slab"
+
+
+def test_calculator_constructor_disables_stress(polar_calc_model):
+    calc = MACECalculator(
+        models=[polar_calc_model],
+        model_type="PolarMACE",
+        device="cpu",
+        default_dtype="float64",
+        compute_stress=False,
+    )
+
+    assert calc.compute_stress is False
+    assert "stress" not in calc.implemented_properties
 
 
 def test_legacy_conversion_preserves_tensors_and_rebinds_after_reload(tmp_path):

@@ -59,7 +59,7 @@ def convert_polar_model(model, pbc_handling: str = "auto"):
             block, "set_pbc_handling"
         ):
             raise TypeError(
-                "Conversion requires graph_longrange 0.4.3 electrostatic blocks"
+                "Conversion requires a more recent version of graph_longrange, please refer to the mace docs"
             )
         for module in block.modules():
             if isinstance(module, GTOSelfInteractionBlock):
