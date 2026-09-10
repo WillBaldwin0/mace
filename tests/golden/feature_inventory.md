@@ -385,7 +385,7 @@ Group default: KEEP.
 | `train.save_all_checkpoints` | `--save_all_checkpoints` | `mace/tools/arg_parser.py:1052` | KEEP | `tests/workflows/test_checkpoint_retention.py::test_save_all_checkpoints_leaves_one_per_evaluation` |
 | `train.save_cpu` | `--save_cpu` | `mace/tools/arg_parser.py:1064` | DROP — safetensors checkpoints are device-agnostic, so there is nothing to choose | — |
 
-### 3.10 Acceleration (3)
+### 3.10 Acceleration (4)
 
 Group default: MERGE into backend-dispatch configuration; the numerics are pinned on GPU CI.
 
@@ -394,6 +394,7 @@ Group default: MERGE into backend-dispatch configuration; the numerics are pinne
 | `train.enable_cueq` | `--enable_cueq` | `mace/tools/arg_parser.py:1083` | MERGE — backend dispatch config | `tests/golden/test_backend_parity_golden.py::test_the_calculators_own_backend_flag_reaches_the_same_kernels` |
 | `train.enable_oeq` | `--enable_oeq` | `mace/tools/arg_parser.py:1096` | MERGE — idem | `tests/golden/test_backend_parity_golden.py::test_the_calculators_own_backend_flag_reaches_the_same_kernels` |
 | `train.only_cueq` | `--only_cueq` | `mace/tools/arg_parser.py:1089` | MERGE — idem: 'use cueq for every op, not just the ones that benefit' becomes a dispatch policy, not a second boolean. Its own row precisely because a group-level `--enable_cueq/--only_cueq/--enable_oeq` cell hides it | `tests/golden/test_backend_parity_golden.py::test_converting_for_the_cpu_leaves_cueq_unfused_and_the_audit_says_so` |
+| `train.cueq_conv_fusion` | `--cueq_conv_fusion` | `mace/tools/arg_parser.py:1116` | MERGE — idem: the fusion knob of the same dispatch policy. Its own row because it is the one acceleration flag whose default differs between training (unfused) and inference (fused), which a group-level cell would hide | `tests/unit/test_convert_e3nn_cueq.py::test_only_cueq_uses_training_fusion_policy` + `tests/unit/test_convert_e3nn_cueq.py::test_training_conversion_forwards_fusion_flag` |
 
 ### 3.11 wandb (6)
 
@@ -809,8 +810,8 @@ only the bag spells.
 | `calc.param.eps_infty` | `eps_infty` — MACECalculator | `mace/calculators/mace.py:124` | KEEP — high-frequency dielectric constant used by the field path | `tests/golden/test_tiny_maceles.py::test_the_field_surface_reproduces_its_reference` |
 | `calc.param.electric_field_unit` | `electric_field_unit` — MACECalculator | `mace/calculators/mace.py:125` | KEEP — unit convention for the applied field | `tests/golden/test_tiny_maceles.py::test_the_field_reference_records_the_settings_that_are_not_channels` |
 | `calc.param.keep_neutral` | `keep_neutral` — MACECalculator | `mace/calculators/mace.py:126` | KEEP — charge-neutrality enforcement in the field path | `tests/golden/test_tiny_maceles.py::test_keep_neutral_removes_exactly_a_uniform_field_force` + `tests/golden/test_tiny_maceles.py::test_keep_neutral_leaves_the_reported_bec_alone_and_repeats_identically` |
-| `calc.param.pbc_handling` | `pbc_handling` — MACECalculator | `mace/calculators/mace.py:127` | KEEP — Polar electrostatic boundary treatment can be selected independently of the physical `atoms.pbc` flags | `tests/extensions/polar/test_polar_conversion.py::test_calculator_constructor_propagates_pbc_handling` |
-| `calc.param.compute_stress` | `compute_stress` — MACECalculator | `mace/calculators/mace.py:128` | KEEP — fixed-cell simulations can skip the strain derivative and remove stress from the ASE interface | `tests/extensions/polar/test_polar_conversion.py::test_calculator_constructor_disables_stress` |
+| `calc.param.pbc_handling` | `pbc_handling` — MACECalculator | `mace/calculators/mace.py:128` | KEEP — Polar electrostatic boundary treatment can be selected independently of the physical `atoms.pbc` flags | `tests/extensions/polar/test_polar_conversion.py::test_calculator_constructor_propagates_pbc_handling` |
+| `calc.param.compute_stress` | `compute_stress` — MACECalculator | `mace/calculators/mace.py:129` | KEEP — fixed-cell simulations can skip the strain derivative and remove stress from the ASE interface | `tests/extensions/polar/test_polar_conversion.py::test_calculator_constructor_disables_stress` |
 | `calc.param.head` | `head` — read from `**kwargs` on MACECalculator | `mace/calculators/mace.py:297` | KEEP — which head of a multihead model the calculator evaluates | `tests/workflows/test_run_train.py::test_run_train_multihead` |
 | `calc.param.compute_atomic_stresses` | `compute_atomic_stresses` — read from `**kwargs` on MACECalculator | `mace/calculators/mace.py:216` | KEEP — decides whether `stresses` and `virials` are implemented properties at all | `tests/golden/test_tiny_anchors.py::test_the_two_per_atom_stress_routes_land_on_one_channel` |
 | `calc.param.model_path` | `model_path` — read from `**kwargs` on MACECalculator | `mace/calculators/mace.py:162` | DROP — deprecated singular alias for `model_paths`; it warns and forwards, and refuses when both are given | — |

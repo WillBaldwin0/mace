@@ -7,6 +7,7 @@ import torch
 from e3nn import o3
 
 from mace.modules.wrapper_ops import CuEquivarianceConfig
+from mace.tools import deprecation
 from mace.tools.cg import O3_e3nn
 from mace.tools.cg_cueq_tools import symmetric_contraction_proj
 from mace.tools.scripts_utils import extract_config_mace_model
@@ -220,6 +221,7 @@ def run(
     device="cpu",
     return_model=True,
     layout: str = "ir_mul",
+    conv_fusion: bool = True,
 ):
     # Setup logging
 
@@ -247,7 +249,7 @@ def run(
         layout=layout,
         group="O3_e3nn",
         optimize_all=True,
-        conv_fusion=(torch.device(device).type == "cuda"),
+        conv_fusion=conv_fusion and torch.device(device).type == "cuda",
     )
 
     # Create new model with cuequivariance config
@@ -278,6 +280,7 @@ def run(
 
 
 def main():
+    deprecation.warn("ep.mace_e3nn_cueq")
     parser = argparse.ArgumentParser()
     parser.add_argument("input_model", help="Path to input MACE model")
     parser.add_argument(
