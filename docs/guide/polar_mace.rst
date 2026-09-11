@@ -78,9 +78,9 @@ Use the dedicated ``mace_polar`` loader, which handles model type and path resol
     stress = atoms.get_stress()
 
 When using a ``mace_polar`` model, specify the boundary conditions for the
-electrostatic operations. Available modes are ``auto``, ``pbc``, ``realspace``,
-``slab``, ``molecule_in_box``, and ``mixed_periodic``. The convenience mode
-``auto`` uses ``atoms.pbc`` to select the boundary conditions. See the
+electrostatic operations. Available modes are ``pbc`` (Ewald summation), ``realspace`` (realspace sum),
+``slab`` (Ewald sum + dipole correction), and several other convenience modes. The ``auto`` mode
+uses ``atoms.pbc`` to select the boundary conditions. See the
 `graph_electrostatics documentation
 <https://github.com/WillBaldwin0/graph_electrostatics/blob/develop/docs/README.md>`_
 for more information.
